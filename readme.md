@@ -49,7 +49,7 @@ Let's Encrypt 是一家提供免费 SSL/TLS 证书的认证机构，支持包括
 
 **腾讯云密钥**
 
-- 访问腾讯云控制台的 [API 密钥管理](https://console.cloud.tencent.com/cam/capi)页面，获取 `SecretId` 与 `SecretKey`。
+- 访问腾讯云控制台的 [API 密钥管理](https://console.cloud.tencent.com/cam/capi) 页面，获取 `SecretId` 与 `SecretKey`。
 - 确保当前账户拥有 SSL 与 CDN 管理权限。
 
 ### 配置环境变量
@@ -70,7 +70,7 @@ TENCENT_SECRET_KEY=您的 SecretKey
    ```sh
    node /opt/apps/ssl/main/main.js /opt/apps/ssl/normal/
    ```
-   - `./cert` 为包含 `fullchain.pem` 和 `privkey.pem` 的目录。
+   - `/opt/apps/ssl/normal/` 为包含证书和密钥文件的目录。
    - 未指定路径时，默认使用当前工作目录。
 
 
@@ -106,7 +106,7 @@ TENCENT_SECRET_KEY=您的 SecretKey
 ## 注意事项
 
 - 证书解析并上传成功后，程序将根据证书中包含的 SAN 信息，自动更新对应 CDN 域名的 HTTPS 配置。
-- 对于泛域名证书，即使部分域名当前使用的证书有效期更长，程序也会自动匹配并更新所有符合规则的加速域名。
+- 对于泛域名证书，即使域名当前使用的证书有效期更长，程序也会自动更新所有符合规则的加速域名。
 - 请注意，程序在更新 CDN 配置时不会比较原证书与新证书的有效期差异，而是直接覆盖。
 - 唯一值得欣慰的是（😀），在清理旧证书时，程序不会删除任何有效期晚于新证书的版本。
 - 此外，为保证操作可控，程序仅处理来源为 *上传证书* 的证书记录。
