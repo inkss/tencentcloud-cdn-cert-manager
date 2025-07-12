@@ -1,3 +1,22 @@
+/**
+ * 腾讯云证书更新器：自动更新、上传和删除 CDN 域名的 SSL 证书。
+ * 
+ * 使用前请确保已安装以下依赖：
+ * - tencentcloud-sdk-nodejs-common
+ * - dotenv
+ * - crypto
+ * 
+ * 使用方法：
+ * 1. 设置环境变量 TENCENT_SECRET_ID 和 TENCENT_SECRET_KEY，或在 .env 文件中配置。
+ * 2. 执行脚本并传入证书所在目录路径（默认为当前工作目录）。
+ * 
+ * 示例：node main.js /path/to/cert
+ */
+
+// 定义证书命名格式
+const CERT = "fullchain.pem";
+const KEY = "privkey.pem";
+
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -58,8 +77,8 @@ class CertUpdater {
 
     let cert, key;
     try {
-      cert = fs.readFileSync(`${certPath}/fullchain.pem`, "utf-8");
-      key = fs.readFileSync(`${certPath}/privkey.pem`, "utf-8");
+      cert = fs.readFileSync(`${certPath}/${CERT}`, "utf-8");
+      key = fs.readFileSync(`${certPath}/${KEY}`, "utf-8");
     } catch (err) {
       throw new Error(`读取证书文件失败 (路径: ${certPath}):\n ${err}`);
     }
