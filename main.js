@@ -35,8 +35,8 @@ class CertUpdater {
     // 3. 查找或上传证书，返回证书信息 基于 DescribeCertificate 接口
     const certificate = await this.getOrUploadCertificate(certInfo, cert, key);
 
-    // 4. 获取相关域名
-    const domains = await this.getAllDomains(certInfo.domain);
+    // 4. 获取加速域名
+    const domains = await this.getAllDomains();
 
     // 5. 更新域名证书
     await this.updateDomainCerts(domains, certificate);
@@ -165,13 +165,13 @@ class CertUpdater {
    * @returns {Object<Certificates>} - 托管证书信息
    */
   async getOrUploadCertificate(certInfo, cert, key) {
-    // 根据待上传证书信息的主域名模糊查找 SSL 证书列表
+    // 根据待上传证书信息的 CN 模糊查找 SSL 证书列表
     try {
       this.sslCerts = await this.sslClient.request("DescribeCertificates", {
         "SearchKey": certInfo.domain,
         "ExpirationSort": "DESC",
         "FilterSource": "upload",
-        "Limit": 100
+        "Limit": 200
       });
     } catch (err) {
       console.error(`获取证书列表失败，将上传新证书:\n ${err}`);
@@ -209,33 +209,40 @@ class CertUpdater {
       if (Array.isArray(result.SubjectAltName) && result.SubjectAltName.length === 0) {
         result.SubjectAltName = [result.Domain];
       }
+      if (!result.SubjectAltName.includes(result.Domain)) {
+        result.SubjectAltName.push(result.Domain);
+      }
       return result;
     } catch (err) {
       console.error(`异常错误:\n ${err}`);
-      return { CertificateId: certificateId, SubjectAltName: certInfo.subjectAltName }
+      return {
+        CertificateId: certificateId,
+        SubjectAltName: certInfo.subjectAltName,
+        CertEndTime: certInfo.expires
+      };
     }
   }
 
   /**
-   * 获取（模糊查询）与指定域名相关的所有 CDN 域名。
+   * 获取所有启用了 HTTPS 的在线 CDN 域名。
    * 
-   * @param {string} domain - 证书主域名
    * @returns {Array} - CDN 域名对象列表
    */
-  async getAllDomains(domain) {
+  async getAllDomains() {
+    let allDomains = [];
     try {
       const result = await this.cdnClient.request("DescribeDomains", {
-        Limit: 100,
+        Limit: 200,
         Filters: [
-          { Name: "domain", Value: [domain], Fuzzy: true },
-          { Name: "https", Value: ["on"] }
+          { "Name": "status", "Value": ["online"] },
+          { "Name": "https", "Value": ["on"] }
         ]
       });
-      return result.Domains || [];
+      allDomains = result.Domains || [];
     } catch (err) {
       console.error(`获取 CDN 域名列表失败:\n ${err}`);
-      return [];
     }
+    return [...new Map(allDomains.map(item => [item.Domain, item])).values()];
   }
 
   /**
