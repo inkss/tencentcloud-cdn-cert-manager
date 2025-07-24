@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-> 本项目是一个基于 Node.js  的工具，旨在简化腾讯云 SSL 证书和 CDN 域名配置的管理。
+> 高度概括版本：将已有证书上传到腾讯云托管后，自动根据证书中的域名信息匹配腾讯云账号下的所有加速域名，匹配成功的将自动更新证书。同时还支持自动清理已过期的托管证书。
 
 **功能列表**
 
@@ -65,10 +65,10 @@ TENCENT_SECRET_KEY=您的 SecretKey
 
 1. **基本用法**：
    
-   假设项目路径为：`/opt/apps/ssl/main/main.js`，证书文件存储路径为：`/opt/apps/ssl/normal/`。
+   假设项目路径为：`/opt/apps/ssl/tencentcloud-cdn-cert-manager/`，证书文件存储路径为：`/opt/apps/ssl/normal/`。
    
    ```sh
-   node /opt/apps/ssl/main/main.js /opt/apps/ssl/normal/
+   node /opt/apps/ssl/tencentcloud-cdn-cert-manager/main.js /opt/apps/ssl/normal/
    ```
    - `/opt/apps/ssl/normal/` 为包含证书和密钥文件的目录。
    - 未指定路径时，默认使用当前工作目录。
